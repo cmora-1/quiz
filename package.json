@@ -11,8 +11,8 @@
     "reset_heroku": "heroku pg:reset DATABASE"
   },
   "engines": {
-    "node": "4.2.x",
-    "npm": "2.14.x"
+    "node": "4.4.x",
+    "npm": "2.15.x"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
