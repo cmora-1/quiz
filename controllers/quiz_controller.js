@@ -4,14 +4,13 @@ var Sequelize = require('sequelize');
 
 // Autoload el quiz asociado a :quizId
 exports.load = function(req, res, next, quizId) {
-	//models.Quiz.findById(quizId)
 	models.Quiz.findById(quizId, { include: [ models.Comment ] })
   		.then(function(quiz) {
       		if (quiz) {
         		req.quiz = quiz;
         		next();
       		} else {
-      			next(new Error('No existe quizId=' + quizId));
+      			throw new Error('No existe quizId=' + quizId);
       		}
         })
         .catch(function(error) { next(error); });
@@ -20,26 +19,7 @@ exports.load = function(req, res, next, quizId) {
 
 // GET /quizzes
 exports.index = function(req, res, next) {
-	var srch = req.query.search;
-
-	if (srch == undefined) {
-		// no se ha definido ninguna búsqueda
-		srch = '%';
-	}
-	else {
-		// búsqueda de quizes
-		srch = '%'+srch+'%';
-		srch = srch.replace(/ /g, '%');
-	}
-
-	console.log(srch);
-	models.Quiz.findAll({
-		where: {
-			question: {
-				$like: srch
-			}
-		}
-	})
+	models.Quiz.findAll()
 		.then(function(quizzes) {
 			res.render('quizzes/index.ejs', { quizzes: quizzes});
 		})
@@ -71,6 +51,7 @@ exports.check = function(req, res, next) {
 								   answer: answer });
 };
 
+
 // GET /quizzes/new
 exports.new = function(req, res, next) {
   var quiz = models.Quiz.build({question: "", answer: ""});
@@ -79,13 +60,17 @@ exports.new = function(req, res, next) {
 
 // POST /quizzes/create
 exports.create = function(req, res, next) {
+
+  var authorId = req.session.user && req.session.user.id || 0;
+
   var quiz = models.Quiz.build({ question: req.body.quiz.question,
-  	                             answer:   req.body.quiz.answer} );
+  	                             answer:   req.body.quiz.answer,
+                                 AuthorId: authorId } );
 
   // guarda en DB los campos pregunta y respuesta de quiz
-  quiz.save({fields: ["question", "answer"]})
+  quiz.save({fields: ["question", "answer", "AuthorId"]})
   	.then(function(quiz) {
-		req.flash('success', 'Quiz creado con éxito.');
+		  req.flash('success', 'Quiz creado con éxito.');
     	res.redirect('/quizzes');  // res.redirect: Redirección HTTP a lista de preguntas
     })
     .catch(Sequelize.ValidationError, function(error) {
@@ -98,10 +83,11 @@ exports.create = function(req, res, next) {
       res.render('quizzes/new', {quiz: quiz});
     })
     .catch(function(error) {
-		req.flash('error', 'Error al crear un Quiz: '+error.message);
-		next(error);
+		  req.flash('error', 'Error al crear un Quiz: '+error.message);
+		  next(error);
 	});
 };
+
 
 // GET /quizzes/:id/edit
 exports.edit = function(req, res, next) {
@@ -136,6 +122,7 @@ exports.update = function(req, res, next) {
       next(error);
     });
 };
+
 
 // DELETE /quizzes/:id
 exports.destroy = function(req, res, next) {
