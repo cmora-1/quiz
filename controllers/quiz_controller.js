@@ -19,7 +19,26 @@ exports.load = function(req, res, next, quizId) {
 
 // GET /quizzes
 exports.index = function(req, res, next) {
-	models.Quiz.findAll()
+	var srch = req.query.search;
+
+	if (srch == undefined) {
+		// no se ha definido ninguna búsqueda
+		srch = '%';
+	}
+	else {
+		// búsqueda de quizes
+		srch = '%'+srch+'%';
+		srch = srch.replace(/ /g, '%');
+	}
+
+	console.log(srch);
+	models.Quiz.findAll({
+		where: {
+			question: {
+				$like: srch
+			}
+		}
+	})
 		.then(function(quizzes) {
 			res.render('quizzes/index.ejs', { quizzes: quizzes});
 		})
