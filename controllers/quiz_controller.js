@@ -155,3 +155,9 @@ exports.destroy = function(req, res, next) {
       next(error);
     });
 };
+
+// GET /author
+exports.author = function(req, res, next) {
+
+  res.render('quizzes/author', { autor: 'Carlos Mora y Tito Manu' });
+};

@@ -49,5 +49,7 @@ router.delete('/quizzes/:quizId(\\d+)',    quizController.destroy);
 router.get('/quizzes/:quizId(\\d+)/comments/new',  commentController.new);
 router.post('/quizzes/:quizId(\\d+)/comments',     commentController.create);
 
+// Añado ruta de créditos
+router.get('/author',   quizController.author);
 
 module.exports = router;
