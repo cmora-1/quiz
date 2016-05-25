@@ -110,9 +110,13 @@ exports.create = function(req, res, next) {
             if (user) {
     	        // Crear req.session.user y guardar campos id y username
     	        // La sesión se define por la existencia de: req.session.user
-              req.session.user = {id:user.id, username:user.username, isAdmin:user.isAdmin};
 
-                res.redirect(redir); // redirección a redir
+              // Autologout --> Hora de creación de la sesión
+              var f = new Date();
+              var secs = f.getTime();
+
+    	        req.session.user = {id:user.id, username:user.username, expiration: secs+120000};
+              res.redirect(redir); // redirección a redir
             } else {
                 req.flash('error', 'La autenticación ha fallado. Reinténtelo otra vez.');
                 res.redirect("/session?redir="+redir);

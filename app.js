@@ -41,6 +41,29 @@ app.use(function(req, res, next) {
    next();
 });
 
+// autologout
+app.use(function(req, res, next) {
+  if (res.locals.session.user === undefined) {
+    console.log("Sesión no establecida aún");
+    next();
+  }
+  else {
+    var f = new Date();
+    var secs = f.getTime();
+    console.log("Sesión establecida.");
+    console.log("Expiration = "+res.locals.session.user.expiration+" Actual = "+secs);
+    if (secs > res.locals.session.user.expiration) {
+      console.log("Sesión caducada. Haciendo autologout");
+      delete req.session.user;
+    }
+    else {
+      console.log("Sesión activa. Actualizando expiración de sesión.");
+      res.locals.session.user.expiration = secs+120000;
+    }
+    next();
+  }
+});
+
 app.use('/', routes);
 
 // catch 404 and forward to error handler
