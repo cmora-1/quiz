@@ -32,10 +32,11 @@ exports.new = function(req, res, next) {
 exports.create = function(req, res, next) {
   var comment = models.Comment.build(
       { text:   req.body.comment.text,
-        QuizId: req.quiz.id
+        QuizId: req.quiz.id,
+        AuthorId: req.session.user.id
       });
-
-  comment.save()
+console.log("USUARIO: "+req.session.user.id);
+  comment.save({fields: ["text", "QuizId", "AuthorId"]})
     .then(function(comment) {
       req.flash('success', 'Comentario creado con éxito.');
       res.redirect('/quizzes/' + req.quiz.id);
