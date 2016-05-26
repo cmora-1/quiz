@@ -32,7 +32,7 @@ exports.ownershipRequired = function(req, res, next){
     }
 };
 
-// GET /quizzes
+// GET /quizzes-:format?
 exports.index = function(req, res, next) {
 	var srch = req.query.search;
 
@@ -55,7 +55,23 @@ exports.index = function(req, res, next) {
 		}
 	})
 		.then(function(quizzes) {
-			res.render('quizzes/index.ejs', { quizzes: quizzes});
+			if (req.params.format == undefined || req.params.format == "html")
+				res.render('quizzes/index.ejs', { quizzes: quizzes});
+			else if (req.params.format == "json") {
+				var data = [];
+				for (i=0; i < quizzes.length; i++) {
+					data.push({ "id": quizzes[i].id,
+											"question": quizzes[i].question,
+											"answer": quizzes[i].answer,
+											"createdAt": quizzes[i].createdAt,
+											"updatedAt": quizzes[i].updatedAt});
+				}
+				res.json(data);
+			}
+			else {
+				res.render('error', {message: "Not acceptable: Formato incorrecto", error:{status:406, stack: null}});
+				//next(res.error);
+			}
 		})
 		.catch(function(error) {
 			next(error);
@@ -68,8 +84,19 @@ exports.show = function(req, res, next) {
 
 	var answer = req.query.answer || '';
 
-	res.render('quizzes/show', {quiz: req.quiz,
-								answer: answer});
+	if (req.params.format == undefined || req.params.format == "html")
+		res.render('quizzes/show', {quiz: req.quiz, answer: answer})
+	else if (req.params.format == "json") {
+		res.json({ "id": req.quiz.id,
+								"question": req.quiz.question,
+								"answer": req.quiz.answer,
+								"createdAt": req.quiz.createdAt,
+								"updatedAt": req.quiz.updatedAt});
+	}
+	else {
+		res.render('error', {message: "Not acceptable: Formato incorrecto", error:{status:406, stack: null}});
+		//next(res.error);
+	}
 };
 
 
