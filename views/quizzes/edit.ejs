@@ -4,7 +4,7 @@ Edite la pregunta
 </p>
 
 <p>
-  <form method="post" action="/quizzes/<%= quiz.id %>?_method=PUT" >
+  <form method="post" action="/quizzes/<%= quiz.id %>?_method=PUT" enctype="multipart/form-data">
      <% include _form.ejs %>
   </form>
 </p>
