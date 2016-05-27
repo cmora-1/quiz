@@ -8,6 +8,14 @@
   <% for (var i in quizzes) { %>
      <tr>
         <td>
+          <% if (quizzes[i].Attachment) { %>
+             <img src="<%= quizzes[i].Attachment.url %>" width="50px" />
+          <% } else { %>
+             <img src="/imgs/question.png" width="50px" />
+          <% } %>
+        </td>
+
+        <td>
            <a href="/quizzes/<%= quizzes[i].id %>"><%= quizzes[i].question %></a>
         </td>
         <% if (session.user) { %>
@@ -21,7 +29,7 @@
                     <button>borrar</button>
                  </a>
               </td>
-           <% } %> 
+           <% } %>
         <% } %>
      </tr>
   <% } %>
